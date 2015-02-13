@@ -1,0 +1,21 @@
+language: ruby
+before_install: gem install bundler
+bundler_args: --without tools
+script: "bundle exec rake spec"
+env:
+  - CODECLIMATE_REPO_TOKEN=ab624e4e0be1ac70631beeb8cb61fed99d511a93d8bf437255a4ff94f69e7836
+rvm:
+  - 2.0
+  - 2.1
+  - 2.2
+  - jruby
+  - ruby-head
+  - rbx-2
+matrix:
+  allow_failures:
+      - rvm: 2.2
+      - rvm: jruby-head
+notifications:
+  email:
+    - roberto.ciatti@overhilllab.com
+    - matteo.foccoli@overhilllab.com
