@@ -1,6 +1,6 @@
 # Aria2Driver
 
-TODO: Write a gem description
+Simple api to manage aria2c via api
 
 # Status
 [![Build Status](http://img.shields.io/travis/OverHillLab/aria2_driver/master.svg)](https://travis-ci.org/OverHillLab/aria2_driver?branch=master)
