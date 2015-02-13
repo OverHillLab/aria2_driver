@@ -2,6 +2,10 @@
 
 TODO: Write a gem description
 
+# Status
+[![Build Status](http://http://img.shields.io/travis/OverHillLab/aria2_driver/master.svg)](https://travis-ci.org/OverHillLab/aria2_driver?branch=master)
+[![Code Climate](http://img.shields.io/codeclimate/github/OverHillLab/aria2_driver.svg)](https://codeclimate.com/OverHillLab/aria2_driver)
+
 ## Installation
 
 Add this line to your application's Gemfile:
