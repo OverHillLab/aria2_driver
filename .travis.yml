@@ -1,8 +1,9 @@
 language: ruby
 before_install: gem install bundler
 script: "bundle exec rake spec"
-env:
-  - CODECLIMATE_REPO_TOKEN=ab624e4e0be1ac70631beeb8cb61fed99d511a93d8bf437255a4ff94f69e7836
+addons:
+  code_climate:
+    repo_token: ab624e4e0be1ac70631beeb8cb61fed99d511a93d8bf437255a4ff94f69e7836
 rvm:
   - 2.0
   - 2.1
