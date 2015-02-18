@@ -8,8 +8,12 @@ module Aria2Driver
         'aria2.getVersion'
       end
 
+      let :params do
+        ['sample_gid', {max_download_limit: '10K'}]
+      end
+
       subject do
-        Aria2Driver::JsonRpc::Request.new method
+        Aria2Driver::JsonRpc::Request.new method, params
       end
 
       it 'should create a new request' do
@@ -18,7 +22,7 @@ module Aria2Driver
         expect(subject.to_hash).to eq({
                                           jsonrpc: '2.0',
                                           method: method,
-                                          params: []
+                                          params: params
                                       })
       end
     end
