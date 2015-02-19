@@ -18,7 +18,6 @@ module Aria2Driver
                                                      })
       end
 
-
       it 'should create from url' do
         client = Aria2Driver::JsonRpc::Client.from_url(
             'https://localhost:9090/jsonrpc', {id: 'my', token: 'abcd-1234'})
@@ -33,25 +32,13 @@ module Aria2Driver
 
       describe 'requests' do
         it 'simple request' do
-          stubbed_request = Mocks::JsonRpc::GetVersionRequest.new('localhost', {port: 9090, params: ["token:abcd-1234"]})
+          stubbed_request = Mocks::JsonRpc::GetVersionRequest.new('localhost', {port: 80, params: ["token:abcd-1234"]})
           stubbed_request.stub.with_success
 
           client = Aria2Driver::JsonRpc::Client.from_url(
-              'https://localhost:9090/jsonrpc', {id: 'local_client', token: 'abcd-1234'})
+              'https://localhost:80/jsonrpc', {id: 'local_client', token: 'abcd-1234'})
           response = client.request(Aria2Driver::JsonRpc::Request.new 'aria2.getVersion')
-
-
         end
-      end
-
-      def get_version_response_body
-        '"{"id":"local_client",' +
-            '"jsonrpc":"2.0",' +
-            '"result":{"enabledFeatures":' +
-            '["BitTorrent","Firefox3 Cookie",' +
-            '"GZip","HTTPS","Message Digest",' +
-            '"Metalink","XML-RPC"],' +
-            '"version":"1.18.9"}}"'
       end
     end
   end
