@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'support/mocks/json_rpc/get_version'
 
 module Aria2Driver
   module JsonRpc
@@ -32,21 +33,14 @@ module Aria2Driver
 
       describe 'requests' do
         it 'simple request' do
-          stub_request(:post, "http://localhost:9090/jsonrpc").with(
-              body: "{\"jsonrpc\":\"2.0\","+
-                  "\"method\":\"aria2.getVersion\"," +
-                  "\"params\":[\"token:abcd-1234\"]," +
-                  "\"id\":\"local_client\"}",
-              headers: {
-                  'Accept' => 'application/json',
-                  'Content-Type' => 'application/json'
-              }).to_return({
-                               status: 200,
-                               body: get_version_response_body
-                           })
+          stubbed_request = Mocks::JsonRpc::GetVersionRequest.new('localhost', {port: 9090, params: ["token:abcd-1234"]})
+          stubbed_request.stub.with_success
+
           client = Aria2Driver::JsonRpc::Client.from_url(
               'https://localhost:9090/jsonrpc', {id: 'local_client', token: 'abcd-1234'})
           response = client.request(Aria2Driver::JsonRpc::Request.new 'aria2.getVersion')
+
+
         end
       end
 
