@@ -4,7 +4,8 @@ module Mocks
   module JsonRpc
 
     class Request
-      attr_reader :request_method, :uri, :body, :headers, :params
+      attr_reader :request_method, :uri, :body, :headers, :params,
+                  :client_id, :json_rpc_version
 
       DEFAULT_HEADERS = {
           'Accept' => 'application/json',
@@ -14,6 +15,7 @@ module Mocks
       DEFAULT_PORT = 80
       DEFAULT_PATH = 'jsonrpc'
       DEFAULT_CLIENT_ID = 'fake_id'
+      DEFAULT_JSON_RPC_VERSION = '2.0'
 
 
       def initialize(host, options={})
@@ -24,11 +26,12 @@ module Mocks
             options[:scheme] || DEFAULT_SCHEME)
         @params = options[:params] || []
         @client_id = options[:client_id] || DEFAULT_CLIENT_ID
+        @json_rpc_version = options[:json_rpc_version] || DEFAULT_JSON_RPC_VERSION
         set_headers DEFAULT_HEADERS
       end
 
-      def stub()
-        request rpc_method, params, response_clazz
+      def with_response(response)
+        request rpc_method, response
       end
 
 
@@ -38,15 +41,11 @@ module Mocks
         raise NotImplementedError
       end
 
-      def response_clazz
-        raise NotImplementedError
-      end
-
       private
 
-      def request(rpc, params, clazz)
+      def request(rpc, response)
         set_body(rpc, params) if !params.empty?
-        clazz.new self
+        response.stub_for self
       end
 
       def build_uri(host, path, port, scheme)

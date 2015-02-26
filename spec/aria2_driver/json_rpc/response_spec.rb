@@ -27,7 +27,7 @@ module Aria2Driver
       end
 
       it 'should build a response with a result' do
-        response = Response.new successful_response
+        response = Aria2Driver::JsonRpc::Response.new successful_response
 
         expect(response.id).to eq('local_client')
         expect(response.jsonrpc).to eq('2.0')
@@ -42,7 +42,7 @@ module Aria2Driver
       end
 
       it 'should build a response with a error' do
-        response = Response.new error_response
+        response = Aria2Driver::JsonRpc::Response.new error_response
 
         expect(response.id).to eq('local_client')
         expect(response.jsonrpc).to eq('2.0')

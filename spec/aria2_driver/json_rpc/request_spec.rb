@@ -5,7 +5,7 @@ module Aria2Driver
     describe Request do
 
       let :method do
-        'aria2.getVersion'
+        'aria2.method'
       end
 
       let :params do
