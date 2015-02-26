@@ -6,9 +6,7 @@ module Mocks
 
       def stub_for(request)
         @request = request
-        stubbed_request = WebMock::API.stub_request(
-            request.request_method, request.uri
-        )
+        stubbed_request = request.stubbed_request
         with_hash = {}
         with_hash[:body] = request.body if request.body
         with_hash[:headers] = request.headers if request.headers

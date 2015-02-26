@@ -5,7 +5,7 @@ module Mocks
 
     class Request
       attr_reader :request_method, :uri, :body, :headers, :params,
-                  :client_id, :json_rpc_version
+                  :client_id, :json_rpc_version, :stubbed_request
 
       DEFAULT_HEADERS = {
           'Accept' => 'application/json',
@@ -28,6 +28,7 @@ module Mocks
         @client_id = options[:client_id] || DEFAULT_CLIENT_ID
         @json_rpc_version = options[:json_rpc_version] || DEFAULT_JSON_RPC_VERSION
         set_headers DEFAULT_HEADERS
+        stub_request
       end
 
       def with_response(response)
@@ -59,6 +60,12 @@ module Mocks
                                   params: params,
                                   id: 'local_client'
                               })
+      end
+
+      def stub_request
+        @stubbed_request = WebMock::API.stub_request(
+            request_method, uri
+        )
       end
 
       def set_headers(headers)
