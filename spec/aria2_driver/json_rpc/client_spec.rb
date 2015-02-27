@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'support/mocks/json_rpc/get_version'
+require 'support/mocks/json_rpc/add_uri'
 
 module Aria2Driver
   module JsonRpc
@@ -78,6 +79,27 @@ module Aria2Driver
           expect(response.result['enabledFeatures']).to eq(mock_response.result[:enabledFeatures])
         end
 
+        it 'add_uri request' do
+          stubbed_request = Mocks::JsonRpc::AddUriRequest.new('localhost',
+                                                              {
+                                                                  port: 80,
+                                                                  params: [
+                                                                      "token:abcd-1234",
+                                                                      ['http://www.example.com/a.jpg'],
+                                                                      {"dir" => "/tmp/"}
+                                                                  ]
+                                                              })
+          mock_response = Mocks::JsonRpc::AddUriSuccessfulResponse.new
+          stubbed_request.with_response(mock_response)
+
+          aria2 = Aria2Driver::JsonRpc::Client.from_url(
+              'https://localhost:80/jsonrpc', {id: 'local_client', token: 'abcd-1234'})
+
+          response = aria2.add_uri({params: [['http://www.example.com/a.jpg'], {"dir" => "/tmp/"}]})
+
+          expect(response.error?).to be_falsey
+          expect(response.result).to eq(mock_response.result)
+        end
 
       end
     end

@@ -13,7 +13,7 @@ module Aria2Driver
       end
 
       subject do
-        Aria2Driver::JsonRpc::Request.new method, params
+        Aria2Driver::JsonRpc::Request.new method, {params: params}
       end
 
       it 'should create a new request' do

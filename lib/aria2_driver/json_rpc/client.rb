@@ -32,20 +32,24 @@ module Aria2Driver
       end
 
       def method_missing(method, *args)
-        rpc_method = snake_lower_camel method.to_s
-        if supported_request?(rpc_method)
-          request Aria2Driver::JsonRpc::Request.new "aria2.#{rpc_method}"
+        if supported_request?(method)
+          rpc_method = snake_lower_camel method.to_s
+          if args.any?
+            request Aria2Driver::JsonRpc::Request.new "aria2.#{rpc_method}", args[0]
+          else
+            request Aria2Driver::JsonRpc::Request.new "aria2.#{rpc_method}"
+          end
         end
       end
 
       def respond_to_missing?(method, include_private = false)
-        supported_request?(snake_lower_camel(method.to_s))
+        supported_request?(method)
       end
 
       private
 
       def supported_request?(request)
-        %w(getVersion).include?(request)
+        [:get_version, :add_uri].include?(request)
       end
 
       def snake_lower_camel(snake)

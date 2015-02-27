@@ -10,10 +10,10 @@ module Aria2Driver
 
       attr_reader :rpc_method, :params, :path
 
-      def initialize(rpc_method, params=[], path=nil)
-        @path = path || DEFAULT_PATH
+      def initialize(rpc_method, options={})
+        @path = options[:path] || DEFAULT_PATH
         @rpc_method = rpc_method
-        @params = params
+        @params = options[:params] || []
       end
 
       def to_hash
