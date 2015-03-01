@@ -15,14 +15,17 @@ module Aria2Driver
         @connection = Aria2Driver::JsonRpc::Connection.new host, options
       end
 
-
       def request(request)
         req_hash = request_to_hash(request)
         http = Net::HTTP.new(connection.host, connection.port)
-        request = build_http_request(req_hash, request)
-
-        http_response = http.request(request)
-
+        http_response = http.request_post(
+            request.path,
+            JSON.generate(req_hash),
+            {
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            }
+        )
         Aria2Driver::JsonRpc::Response.new(JSON.parse(http_response.body))
       end
 
@@ -65,14 +68,6 @@ module Aria2Driver
         req_hash[:params].insert(0, "token:#{token}")
         req_hash[:id] = id
         req_hash
-      end
-
-      def build_http_request(req_hash, request)
-        Net::HTTP::Post.new(request.path).tap do |request|
-          request.body=JSON.generate(req_hash)
-          request['Accept'] = 'application/json'
-          request['Content-Type'] = 'application/json'
-        end
       end
 
     end

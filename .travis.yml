@@ -1,21 +1,29 @@
 language: ruby
 before_install: gem install bundler
-script: "bundle exec rake spec"
+script: bundle exec rake spec
 addons:
   code_climate:
     repo_token: ab624e4e0be1ac70631beeb8cb61fed99d511a93d8bf437255a4ff94f69e7836
 rvm:
-  - 2.0
-  - 2.1
-  - 2.2
-  - jruby
-  - ruby-head
-  - rbx-2
+- 2.0
+- 2.1
+- 2.2
+- jruby
+- ruby-head
+- rbx-2
 matrix:
   allow_failures:
-      - rvm: rbx-2
-      - rvm: ruby-head
+  - rvm: rbx-2
+  - rvm: ruby-head
 notifications:
   email:
-    - roberto.ciatti@overhilllab.com
-    - matteo.foccoli@overhilllab.com
+  - roberto.ciatti@overhilllab.com
+  - matteo.foccoli@overhilllab.com
+deploy:
+  provider: rubygems
+  api_key:
+    secure: f0JeJrfONLwfwYA2B8MZWNZ0yr7dZn9wtgZKKqP20F5qTjswlPSMndU3/WwbHoYYbCcmgj30zDDld4IBcoGofh+bSSPwSmgtm05+cKYakKiHz8Hqja0ygcxt9w+T7IC8anH0HdNd6DGKvXOBKC5x4w5xGeAiKRmYNGpm+htX6ZA=
+  gem: aria2_driver
+  on:
+    tags: true
+    repo: OverHillLab/aria2_driver
