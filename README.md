@@ -3,6 +3,7 @@
 Simple api to manage aria2c via api
 
 # Status
+[![Gem Version](https://badge.fury.io/rb/aria2_driver.svg)](http://badge.fury.io/rb/aria2_driver)
 [![Build Status](http://img.shields.io/travis/OverHillLab/aria2_driver/master.svg)](https://travis-ci.org/OverHillLab/aria2_driver?branch=master)
 [![Code Climate](http://img.shields.io/codeclimate/github/OverHillLab/aria2_driver.svg)](https://codeclimate.com/github/OverHillLab/aria2_driver)
 
