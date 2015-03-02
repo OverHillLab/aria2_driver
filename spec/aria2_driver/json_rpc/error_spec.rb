@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'aria2_driver/json_rpc/error'
 
 module Aria2Driver
   module JsonRpc

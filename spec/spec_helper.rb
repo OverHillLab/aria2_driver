@@ -5,7 +5,6 @@ end
 
 require 'json_spec'
 require 'webmock/rspec'
-
 require 'aria2_driver'
 
 RSpec.configure do |config|

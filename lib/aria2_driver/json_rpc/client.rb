@@ -1,6 +1,11 @@
 require 'securerandom'
 require 'json'
 
+require 'aria2_driver/json_rpc/connection'
+require 'aria2_driver/json_rpc/request'
+require 'aria2_driver/json_rpc/response'
+
+
 module Aria2Driver
   module JsonRpc
     class Client
