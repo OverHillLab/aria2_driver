@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Aria2Driver::VERSION
   spec.authors       = ['Roberto Ciatti', 'Matteo Foccoli']
   spec.email         = ['info@overhilllab.com']
-  spec.summary       = 'Simple api to manage aria2c via api'
-  spec.description   = ''
-  spec.homepage      = ""
+  spec.description   = 'Simple api to manage aria2c via api'
+  spec.summary       = spec.description
+  spec.homepage      = "https://github.com/OverHillLab/aria2_driver"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
