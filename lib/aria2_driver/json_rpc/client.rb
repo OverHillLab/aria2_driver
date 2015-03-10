@@ -4,6 +4,7 @@ require 'json'
 require 'aria2_driver/json_rpc/connection'
 require 'aria2_driver/json_rpc/request'
 require 'aria2_driver/json_rpc/response'
+require 'aria2_driver/json_rpc/response_exception'
 
 
 module Aria2Driver
@@ -23,21 +24,21 @@ module Aria2Driver
       def request(request)
         req_hash = request_to_hash(request)
         http = Net::HTTP.new(connection.host, connection.port)
-        http_response = http.request_post(
-            request.path,
-            JSON.generate(req_hash),
-            {
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            }
-        )
-        Aria2Driver::JsonRpc::Response.new(JSON.parse(http_response.body))
+        begin
+          http_response = http.request_post(
+              request.path,
+              JSON.generate(req_hash),
+              {
+                  'Accept' => 'application/json',
+                  'Content-Type' => 'application/json'
+              }
+          )
+          Aria2Driver::JsonRpc::Response.new(JSON.parse(http_response.body))
+        rescue Exception => ex
+          raise Aria2Driver::JsonRpc::ResponseException.new "Connection Error"
+        end
       end
 
-      def self.from_url(url, options={})
-        uri = URI.parse(url)
-        new uri.host, options.merge({scheme: uri.scheme, port: uri.port, path: uri.path})
-      end
 
       def method_missing(method, *args)
         if supported_request?(method)
@@ -61,7 +62,7 @@ module Aria2Driver
       end
 
       def snake_lower_camel(snake)
-        snake.gsub(/(_.)/){ $1.upcase[-1] }
+        snake.gsub(/(_.)/) { $1.upcase[-1] }
       end
 
       def generate_uuid

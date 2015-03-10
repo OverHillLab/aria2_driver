@@ -21,8 +21,12 @@ module Aria2Driver
       end
 
       it 'should create from url' do
-        client = Aria2Driver::JsonRpc::Client.from_url(
-            'https://localhost:9090/jsonrpc', {id: 'my', token: 'abcd-1234'})
+        client = Aria2Driver::JsonRpc::Client.new 'localhost', {
+                                                                 id: 'my',
+                                                                 scheme: 'https',
+                                                                 port: 9090,
+                                                                 token: 'abcd-1234'
+                                                             }
         expect(client.id).to eq('my')
         expect(client.token).to eq('abcd-1234')
         expect(client.connection).to have_attributes({
@@ -32,14 +36,26 @@ module Aria2Driver
                                                      })
       end
 
+
       describe 'requests' do
+
+        let :aria2 do
+          Aria2Driver::JsonRpc::Client.new 'localhost', {
+                                                          id: 'local_client',
+                                                          token: 'abcd-1234'
+                                                      }
+        end
+
         it 'simple successful generic request' do
-          stubbed_request = Mocks::JsonRpc::GetVersionRequest.new('localhost', {port: 80, params: ["token:abcd-1234"]})
+          stubbed_request = Mocks::JsonRpc::GetVersionRequest.new('localhost',
+                                                                  {
+                                                                      port: 80,
+                                                                      params: ["token:abcd-1234"]
+                                                                  })
           mock_response = Mocks::JsonRpc::GetVersionSuccessfulResponse.new
           stubbed_request.with_response(mock_response)
 
-          client = Aria2Driver::JsonRpc::Client.from_url(
-              'http://localhost:80/jsonrpc', {id: 'local_client', token: 'abcd-1234'})
+          client = aria2
           response = client.request(Aria2Driver::JsonRpc::Request.new 'aria2.getVersion')
 
           expect(response.error?).to be_falsey
@@ -52,9 +68,7 @@ module Aria2Driver
           mock_error_response = Mocks::JsonRpc::ErrorResponse.new({code: -32700, message: 'Parse error'})
           stubbed_request.with_response(mock_error_response)
 
-          client = Aria2Driver::JsonRpc::Client.from_url(
-              'http://localhost:80/jsonrpc', {id: 'local_client', token: 'abcd-1234'})
-          response = client.request(Aria2Driver::JsonRpc::Request.new 'aria2.getVersion')
+          response = aria2.request(Aria2Driver::JsonRpc::Request.new 'aria2.getVersion')
 
           expect(response.error?).to be_truthy
           expect(response.error).to have_attributes({
@@ -62,92 +76,91 @@ module Aria2Driver
                                                         message: mock_error_response.message
                                                     })
         end
-      end
 
-      describe 'version' do
-        it 'get_version request' do
-          stubbed_request = Mocks::JsonRpc::GetVersionRequest.new('localhost', {port: 80, params: ["token:abcd-1234"]})
-          mock_response = Mocks::JsonRpc::GetVersionSuccessfulResponse.new
-          stubbed_request.with_response(mock_response)
+        it 'handle connection refused on request' do
+          stub_request(:any, 'http://localhost:80/jsonrpc').to_raise(Errno::ECONNREFUSED)
 
-          aria2 = Aria2Driver::JsonRpc::Client.from_url(
-              'http://localhost:80/jsonrpc', {id: 'local_client', token: 'abcd-1234'})
-
-          expect(aria2.respond_to?(:get_version)).to be true
-
-          response = aria2.get_version
-
-          expect(response.error?).to be_falsey
-          expect(response.result['version']).to eq(mock_response.result['version'])
-          expect(response.result['enabledFeatures']).to eq(mock_response.result['enabledFeatures'])
-        end
-      end
-
-      describe 'add uri' do
-        it 'add_uri request' do
-          stubbed_request = Mocks::JsonRpc::AddUriRequest.new('localhost',
-                                                              {
-                                                                  port: 80,
-                                                                  params: [
-                                                                      "token:abcd-1234",
-                                                                      ['http://www.example.com/a.jpg'],
-                                                                      {"dir" => "/tmp/"}
-                                                                  ]
-                                                              })
-          mock_response = Mocks::JsonRpc::AddUriSuccessfulResponse.new
-          stubbed_request.with_response(mock_response)
-
-          aria2 = Aria2Driver::JsonRpc::Client.from_url(
-              'http://localhost:80/jsonrpc', {id: 'local_client', token: 'abcd-1234'})
-
-          response = aria2.add_uri({params: [['http://www.example.com/a.jpg'], {"dir" => "/tmp/"}]})
-
-          expect(response.error?).to be_falsey
-          expect(response.result).to eq(mock_response.result)
-        end
-      end
-
-      describe 'status' do
-        it 'tell_status simple request' do
-          stubbed_request = Mocks::JsonRpc::TellStatusRequest.new('localhost',
-                                                              {
-                                                                  port: 80,
-                                                                  params: [
-                                                                      "token:abcd-1234",
-                                                                      "2089b05ecca3d829"
-                                                                  ]
-                                                              })
-          mock_response = Mocks::JsonRpc::TellStatusSuccessfulResponse.new
-          stubbed_request.with_response(mock_response)
-
-          aria2 = Aria2Driver::JsonRpc::Client.new 'localhost', {port: 80, id: 'local_client', token: 'abcd-1234'}
-          response = aria2.tell_status({params: ["2089b05ecca3d829"]})
-
-          expect(response.error?).to be_falsey
-          expect(response.result).to eq(mock_response.result)
+          expect{aria2.request(Aria2Driver::JsonRpc::Request.new 'aria2.getVersion')}
+              .to raise_error(Aria2Driver::JsonRpc::ResponseException)
         end
 
-        it 'tell_status request with selected keys' do
-          stubbed_request = Mocks::JsonRpc::TellStatusRequest.new('localhost',
-                                                                  {
-                                                                      port: 80,
-                                                                      params: [
-                                                                          "token:abcd-1234",
-                                                                          "2089b05ecca3d829",
-                                                                          ["gid", "status"]
-                                                                      ]
-                                                                  })
-          mock_response = Mocks::JsonRpc::TellStatusSuccessfulResponse.new
-          stubbed_request.with_response(mock_response)
+        describe 'version' do
+          it 'get_version request' do
+            stubbed_request = Mocks::JsonRpc::GetVersionRequest.new('localhost', {port: 80, params: ["token:abcd-1234"]})
+            mock_response = Mocks::JsonRpc::GetVersionSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
 
-          aria2 = Aria2Driver::JsonRpc::Client.new 'localhost', {port: 80, id: 'local_client', token: 'abcd-1234'}
-          response = aria2.tell_status({params: ["2089b05ecca3d829", ['gid', 'status']]})
+            expect(aria2.respond_to?(:get_version)).to be true
 
-          expect(response.error?).to be_falsey
-          expect(response.result).to eq({"gid"=>"2089b05ecca3d829", "status"=>"active"})
+            response = aria2.get_version
+
+            expect(response.error?).to be_falsey
+            expect(response.result['version']).to eq(mock_response.result['version'])
+            expect(response.result['enabledFeatures']).to eq(mock_response.result['enabledFeatures'])
+          end
         end
 
+        describe 'add uri' do
+          it 'add_uri request' do
+            stubbed_request = Mocks::JsonRpc::AddUriRequest.new('localhost',
+                                                                {
+                                                                    port: 80,
+                                                                    params: [
+                                                                        "token:abcd-1234",
+                                                                        ['http://www.example.com/a.jpg'],
+                                                                        {"dir" => "/tmp/"}
+                                                                    ]
+                                                                })
+            mock_response = Mocks::JsonRpc::AddUriSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
+
+            response = aria2.add_uri({params: [['http://www.example.com/a.jpg'], {"dir" => "/tmp/"}]})
+
+            expect(response.error?).to be_falsey
+            expect(response.result).to eq(mock_response.result)
+          end
+        end
+
+        describe 'status' do
+          it 'tell_status simple request' do
+            stubbed_request = Mocks::JsonRpc::TellStatusRequest.new('localhost',
+                                                                    {
+                                                                        port: 80,
+                                                                        params: [
+                                                                            "token:abcd-1234",
+                                                                            "2089b05ecca3d829"
+                                                                        ]
+                                                                    })
+            mock_response = Mocks::JsonRpc::TellStatusSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
+
+            response = aria2.tell_status({params: ["2089b05ecca3d829"]})
+
+            expect(response.error?).to be_falsey
+            expect(response.result).to eq(mock_response.result)
+          end
+
+          it 'tell_status request with selected keys' do
+            stubbed_request = Mocks::JsonRpc::TellStatusRequest.new('localhost',
+                                                                    {
+                                                                        port: 80,
+                                                                        params: [
+                                                                            "token:abcd-1234",
+                                                                            "2089b05ecca3d829",
+                                                                            ["gid", "status"]
+                                                                        ]
+                                                                    })
+            mock_response = Mocks::JsonRpc::TellStatusSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
+
+            response = aria2.tell_status({params: ["2089b05ecca3d829", ['gid', 'status']]})
+
+            expect(response.error?).to be_falsey
+            expect(response.result).to eq({"gid" => "2089b05ecca3d829", "status" => "active"})
+          end
+        end
       end
     end
+
   end
 end
