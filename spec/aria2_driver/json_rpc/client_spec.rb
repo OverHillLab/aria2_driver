@@ -55,8 +55,7 @@ module Aria2Driver
           mock_response = Mocks::JsonRpc::GetVersionSuccessfulResponse.new
           stubbed_request.with_response(mock_response)
 
-          client = aria2
-          response = client.request(Aria2Driver::JsonRpc::Request.new 'aria2.getVersion')
+          response = aria2.request(Aria2Driver::JsonRpc::Request.new 'aria2.getVersion')
 
           expect(response.error?).to be_falsey
           expect(response.result['version']).to eq(mock_response.result['version'])
