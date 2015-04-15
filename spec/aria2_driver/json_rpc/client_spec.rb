@@ -3,6 +3,8 @@ require 'support/mocks/json_rpc/get_version'
 require 'support/mocks/json_rpc/add_uri'
 require 'support/mocks/json_rpc/remove'
 require 'support/mocks/json_rpc/force_remove'
+require 'support/mocks/json_rpc/remove_download_result'
+require 'support/mocks/json_rpc/purge_download_result'
 require 'support/mocks/json_rpc/tell_status'
 
 module Aria2Driver
@@ -156,6 +158,46 @@ module Aria2Driver
             stubbed_request.with_response(mock_response)
 
             response = aria2.force_remove({params: ['2089b05ecca3d829']})
+
+            expect(response.error?).to be_falsey
+            expect(response.result).to eq(mock_response.result)
+          end
+        end
+
+        describe 'remove download result' do
+          it 'remove download result request' do
+            stubbed_request = Mocks::JsonRpc::RemoveDownloadResultRequest.new('localhost',
+                                                                     {
+                                                                         port: 80,
+                                                                         params: [
+                                                                             'token:abcd-1234',
+                                                                             '2089b05ecca3d829'
+                                                                         ]
+                                                                     })
+            mock_response = Mocks::JsonRpc::RemoveDownloadResultSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
+
+            response = aria2.remove_download_result({params: ['2089b05ecca3d829']})
+
+            expect(response.error?).to be_falsey
+            expect(response.result).to eq(mock_response.result)
+          end
+        end
+
+        describe 'purge download result' do
+          it 'purge download result request' do
+            stubbed_request = Mocks::JsonRpc::PurgeDownloadResultRequest.new('localhost',
+                                                                              {
+                                                                                  port: 80,
+                                                                                  params: [
+                                                                                      'token:abcd-1234'
+                                                                                  ]
+                                                                              })
+            mock_response = Mocks::JsonRpc::PurgeDownloadResultSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
+            stubbed_request.with_response(mock_response)
+
+            response = aria2.purge_download_result()
 
             expect(response.error?).to be_falsey
             expect(response.result).to eq(mock_response.result)

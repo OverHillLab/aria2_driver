@@ -58,7 +58,13 @@ module Aria2Driver
       private
 
       def supported_request?(request)
-        [:get_version, :add_uri, :remove, :force_remove, :tell_status].include?(request)
+        [
+            :get_version,
+            :add_uri,
+            :remove, :force_remove,
+            :remove_download_result, :purge_download_result,
+            :tell_status
+        ].include?(request)
       end
 
       def snake_lower_camel(snake)
