@@ -63,7 +63,8 @@ module Aria2Driver
             :add_uri,
             :remove, :force_remove,
             :remove_download_result, :purge_download_result,
-            :tell_status
+            :tell_status,
+            :pause, :force_pause
         ].include?(request)
       end
 
