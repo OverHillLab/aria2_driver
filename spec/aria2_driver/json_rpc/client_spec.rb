@@ -2,6 +2,7 @@ require 'spec_helper'
 require 'support/mocks/json_rpc/get_version'
 require 'support/mocks/json_rpc/add_uri'
 require 'support/mocks/json_rpc/remove'
+require 'support/mocks/json_rpc/force_remove'
 require 'support/mocks/json_rpc/tell_status'
 
 module Aria2Driver
@@ -135,6 +136,26 @@ module Aria2Driver
             stubbed_request.with_response(mock_response)
 
             response = aria2.remove({params: ['2089b05ecca3d829']})
+
+            expect(response.error?).to be_falsey
+            expect(response.result).to eq(mock_response.result)
+          end
+        end
+
+        describe 'force remove' do
+          it 'remove request using force' do
+            stubbed_request = Mocks::JsonRpc::ForceRemoveRequest.new('localhost',
+                                                                {
+                                                                    port: 80,
+                                                                    params: [
+                                                                        'token:abcd-1234',
+                                                                        '2089b05ecca3d829'
+                                                                    ]
+                                                                })
+            mock_response = Mocks::JsonRpc::ForceRemoveSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
+
+            response = aria2.force_remove({params: ['2089b05ecca3d829']})
 
             expect(response.error?).to be_falsey
             expect(response.result).to eq(mock_response.result)
