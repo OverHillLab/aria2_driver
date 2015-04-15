@@ -64,7 +64,8 @@ module Aria2Driver
             :remove, :force_remove,
             :remove_download_result, :purge_download_result,
             :tell_status,
-            :pause, :force_pause
+            :pause, :force_pause,
+            :get_files, :get_uris
         ].include?(request)
       end
 

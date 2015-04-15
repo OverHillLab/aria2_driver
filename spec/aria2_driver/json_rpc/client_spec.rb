@@ -8,6 +8,8 @@ require 'support/mocks/json_rpc/purge_download_result'
 require 'support/mocks/json_rpc/tell_status'
 require 'support/mocks/json_rpc/pause'
 require 'support/mocks/json_rpc/force_pause'
+require 'support/mocks/json_rpc/get_files'
+require 'support/mocks/json_rpc/get_uris'
 
 module Aria2Driver
   module JsonRpc
@@ -279,6 +281,46 @@ module Aria2Driver
             stubbed_request.with_response(mock_response)
 
             response = aria2.force_pause({params: ['2089b05ecca3d829']})
+
+            expect(response.error?).to be_falsey
+            expect(response.result).to eq(mock_response.result)
+          end
+        end
+
+        describe 'get files' do
+          it 'get files request' do
+            stubbed_request = Mocks::JsonRpc::GetFilesRequest.new('localhost',
+                                                                    {
+                                                                        port: 80,
+                                                                        params: [
+                                                                            'token:abcd-1234',
+                                                                            '2089b05ecca3d829'
+                                                                        ]
+                                                                    })
+            mock_response = Mocks::JsonRpc::GetFilesSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
+
+            response = aria2.get_files({params: ['2089b05ecca3d829']})
+
+            expect(response.error?).to be_falsey
+            expect(response.result).to eq(mock_response.result)
+          end
+        end
+
+        describe 'get uris' do
+          it 'get uris request' do
+            stubbed_request = Mocks::JsonRpc::GetUrisRequest.new('localhost',
+                                                                  {
+                                                                      port: 80,
+                                                                      params: [
+                                                                          'token:abcd-1234',
+                                                                          '2089b05ecca3d829'
+                                                                      ]
+                                                                  })
+            mock_response = Mocks::JsonRpc::GetUrisSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
+
+            response = aria2.get_uris({params: ['2089b05ecca3d829']})
 
             expect(response.error?).to be_falsey
             expect(response.result).to eq(mock_response.result)
