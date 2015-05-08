@@ -10,10 +10,10 @@ require 'support/mocks/json_rpc/pause'
 require 'support/mocks/json_rpc/force_pause'
 require 'support/mocks/json_rpc/get_files'
 require 'support/mocks/json_rpc/get_uris'
+require 'support/mocks/json_rpc/get_global_stat'
 
 module Aria2Driver
   module JsonRpc
-
 
     describe Client do
 
@@ -321,6 +321,25 @@ module Aria2Driver
             stubbed_request.with_response(mock_response)
 
             response = aria2.get_uris({params: ['2089b05ecca3d829']})
+
+            expect(response.error?).to be_falsey
+            expect(response.result).to eq(mock_response.result)
+          end
+        end
+
+        describe 'get stat' do
+          it 'get global stat request' do
+            stubbed_request = Mocks::JsonRpc::GetGlobalStatRequest.new('localhost',
+                                                                 {
+                                                                     port: 80,
+                                                                     params: [
+                                                                         'token:abcd-1234'
+                                                                     ]
+                                                                 })
+            mock_response = Mocks::JsonRpc::GetGlobalStatSuccessfulResponse.new
+            stubbed_request.with_response(mock_response)
+
+            response = aria2.get_global_stat
 
             expect(response.error?).to be_falsey
             expect(response.result).to eq(mock_response.result)
